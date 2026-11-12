@@ -11,14 +11,14 @@ abstract class TodoDatabase : RoomDatabase() {
 
     companion object {
         @Volatile
-        private var INSTANCE: TodoDatabase? = null
+        private var instance: TodoDatabase? = null
 
-        fun get(context: Context): TodoDatabase = INSTANCE ?: synchronized(this) {
-            INSTANCE ?: Room.databaseBuilder(
+        fun get(context: Context): TodoDatabase = instance ?: synchronized(this) {
+            instance ?: Room.databaseBuilder(
                 context.applicationContext,
                 TodoDatabase::class.java,
                 "todo.db"
-            ).build().also { INSTANCE = it }
+            ).build().also { instance = it }
         }
     }
 }

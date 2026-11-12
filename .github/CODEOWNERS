@@ -1,0 +1,14 @@
+# 파일을 바꾸는 PR이 올라오면 아래 담당자가 자동으로 리뷰어로 지정됩니다.
+# 형식: <경로 패턴>  <담당자...>   (담당자는 개인 계정 @아이디 또는 조직 팀 @place-content/팀이름)
+# 아래쪽 규칙이 위쪽 규칙보다 우선합니다.
+#
+# TODO: @GITHUB_ID 를 실제 GitHub 아이디로 바꾼 뒤 맨 앞 '#'을 지우세요.
+
+# 기본: 모든 파일
+# *                       @GITHUB_ID
+
+# 예시) 영역별 담당자를 나누고 싶을 때
+# /app/src/main/java/com/k0h5/todolist/data/   @GITHUB_ID
+# /app/src/main/res/layout/                    @GITHUB_ID
+# /docs/                                       @GITHUB_ID
+# /gradle/ /build.gradle.kts /app/build.gradle.kts   @GITHUB_ID

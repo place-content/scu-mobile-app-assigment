@@ -9,11 +9,9 @@ enum class TodoFilter(val status: TodoStatus?) {
     IN_PROGRESS(TodoStatus.IN_PROGRESS),
     DONE(TodoStatus.DONE);
 
-    fun apply(list: List<Todo>): List<Todo> =
-        if (status == null) list else list.filter { it.status == status }
+    fun apply(list: List<Todo>): List<Todo> = if (status == null) list else list.filter { it.status == status }
 
     companion object {
-        fun countAll(list: List<Todo>): Map<TodoFilter, Int> =
-            entries.associateWith { it.apply(list).size }
+        fun countAll(list: List<Todo>): Map<TodoFilter, Int> = entries.associateWith { it.apply(list).size }
     }
 }

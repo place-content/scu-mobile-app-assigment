@@ -52,8 +52,7 @@ class TodoListViewModel(app: Application) : AndroidViewModel(app) {
 
     suspend fun getById(id: Long): Todo? = repo.getById(id)
 
-    fun add(title: String, note: String, dueDate: String) =
-        viewModelScope.launch { repo.add(title, note, dueDate) }
+    fun add(title: String, note: String, dueDate: String) = viewModelScope.launch { repo.add(title, note, dueDate) }
 
     fun update(id: Long, title: String, note: String, dueDate: String, status: TodoStatus) =
         viewModelScope.launch { repo.update(id, title, note, dueDate, status) }

@@ -59,18 +59,31 @@
 |---|---|---|
 | `./gradlew :app:assembleDebug` | 디버그 APK 빌드 (`app/build/outputs/apk/debug/app-debug.apk`) | `next build` |
 | `./gradlew :app:testDebugUnitTest` | 단위 테스트 | `yarn test` |
-| `./gradlew :app:lintDebug` | 린트 (`app/build/reports/lint-results-debug.html`) | `yarn lint` |
+| `./gradlew :app:lintDebug` | Android 린트 (`app/build/reports/lint-results-debug.html`) | `yarn lint` |
+| `./gradlew ktlintCheck` | Kotlin 코드 스타일 검사 | `eslint` / `prettier --check` |
+| `./gradlew ktlintFormat` | Kotlin 코드 스타일 자동 정리 | `prettier --write` |
 
-변경 후에는 세 개 모두 통과해야 합니다. 린트는 **오류 0개**가 기준입니다. (라이브러리 새 버전 안내, 버튼 스타일 권장 같은 경고는 남아 있음)
+변경 후에는 `assembleDebug`, `testDebugUnitTest`, `lintDebug`, `ktlintCheck` 네 개 모두 통과해야 합니다. 커밋 전에 `ktlintFormat`을 한 번 돌리면 대부분의 스타일 문제가 자동으로 정리됩니다. (자동으로 못 고치는 것은 직접 수정 — 예: 변수 이름 규칙) 린트는 **오류 0개**가 기준입니다. (라이브러리 새 버전 안내, 버튼 스타일 권장 같은 경고는 남아 있음)
 
 Android Studio에서는 Gradle Sync 후 상단 ▶ Run으로 에뮬레이터/기기에 설치합니다.
 
-## 6. 새 기능 추가 절차
+## 6. 코드 스타일 · 협업 설정 파일 (루트)
+| 파일 | 역할 |
+|---|---|
+| `.editorconfig` | 들여쓰기 4칸, UTF-8, LF 줄바꿈, 파일 끝 줄바꿈, Kotlin 스타일 `android_studio`, 한 줄 최대 120자. Android Studio와 ktlint가 같은 규칙을 읽음 |
+| `.gitattributes` | 저장소 줄바꿈을 LF로 통일 (`.bat`만 CRLF). Windows 팀원이 있어도 `gradlew`가 깨지지 않음. 이미지·jar는 바이너리로 처리 |
+| `build.gradle.kts` (루트) | `ktlintCheck`, `ktlintFormat` 작업 정의. ktlint 버전은 `gradle/libs.versions.toml`의 `ktlint` |
+| `.github/CODEOWNERS` | 파일을 바꾸면 리뷰어가 자동으로 지정됨 |
+| `CHANGELOG.md` | 버전별 변경 기록. 기능을 추가하면 `[Unreleased]`에 한 줄 추가, 버전을 올릴 때 날짜를 붙여 정리 |
+
+ktlint를 Gradle 플러그인이 아니라 CLI로 연결한 이유: 이 프로젝트의 AGP 9는 Kotlin을 내장 방식으로 처리해서, 기존 ktlint Gradle 플러그인이 소스를 제대로 찾지 못할 수 있기 때문입니다.
+
+## 7. 새 기능 추가 절차
 1. **데이터가 필요하면** `Todo.kt`에 필드 추가 → `TodoDatabase`의 `version` 올리기
    - 지금은 마이그레이션 코드가 없으므로 버전을 올리면 기존 데이터 처리가 필요함 (개발 중엔 앱 삭제 후 재설치로 해결)
 2. 쿼리가 필요하면 `TodoDao` → `TodoRepository`에 함수 추가
 3. 판단 로직은 `vm/`에 순수 함수로 만들고 **테스트 먼저 작성**
 4. `TodoListViewModel`에 상태(`StateFlow`)나 이벤트 함수 추가
 5. 화면 글자는 `strings.xml`, 레이아웃은 `res/layout`, 연결은 Activity에서
-6. 빌드 · 테스트 · 린트 통과 확인
-7. `README.md`와 `docs/`(특히 [07-testing.md](07-testing.md) 체크리스트, [08-decisions.md](08-decisions.md)) 갱신
+6. `ktlintFormat` 후 빌드 · 테스트 · 린트 · `ktlintCheck` 통과 확인
+7. `README.md`, `CHANGELOG.md`, `docs/`(특히 [07-testing.md](07-testing.md) 체크리스트, [08-decisions.md](08-decisions.md)) 갱신

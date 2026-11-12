@@ -19,18 +19,19 @@ import kotlinx.coroutines.launch
 
 class EditTodoActivity : AppCompatActivity() {
     companion object {
-        const val EXTRA_ID = "extra_id"          // 편집할 Todo id (입력/출력)
+        const val EXTRA_ID = "extra_id" // 편집할 Todo id (입력/출력)
         const val EXTRA_TITLE = "extra_title"
         const val EXTRA_NOTE = "extra_note"
         const val EXTRA_DUE = "extra_due"
         const val EXTRA_STATUS = "extra_status"
-        const val EXTRA_DELETE = "extra_delete"  // true면 삭제 요청
+        const val EXTRA_DELETE = "extra_delete" // true면 삭제 요청
         private const val STATE_ORIGINAL_DUE = "state_original_due"
     }
 
     private lateinit var binding: ActivityEditTodoBinding
     private val vm: TodoListViewModel by viewModels()
     private var todoId: Long = -1L
+
     // 불러온 원래 마감일 (이미 지난 날짜라도 그대로 두는 건 허용하기 위해 보관)
     private var originalDue = ""
 

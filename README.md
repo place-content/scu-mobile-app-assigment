@@ -151,6 +151,8 @@ res/layout
 ./gradlew :app:assembleDebug        # 디버그 APK 빌드
 ./gradlew :app:testDebugUnitTest    # 단위 테스트
 ./gradlew :app:lintDebug            # 린트
+./gradlew ktlintCheck               # Kotlin 코드 스타일 검사
+./gradlew ktlintFormat              # Kotlin 코드 스타일 자동 정리
 ```
 
 ## 8. 테스트

@@ -18,7 +18,9 @@ fun EditText.setupDuePicker(earliest: () -> String) {
         val dialog = DatePickerDialog(
             context,
             { _, year, month, day -> setText(formatDue(year, month + 1, day)) },
-            y, m - 1, d
+            y,
+            m - 1,
+            d
         )
         parseDue(min)?.let { (minY, minM, minD) ->
             dialog.datePicker.minDate = Calendar.getInstance().apply {
@@ -38,8 +40,7 @@ fun todayDue(): String {
     return formatDue(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH))
 }
 
-fun formatDue(year: Int, month: Int, day: Int): String =
-    String.format(Locale.US, "%04d-%02d-%02d", year, month, day)
+fun formatDue(year: Int, month: Int, day: Int): String = String.format(Locale.US, "%04d-%02d-%02d", year, month, day)
 
 // "2026-12-01" → (2026, 12, 1), 형식이 다르면 null
 fun parseDue(s: String): Triple<Int, Int, Int>? {
