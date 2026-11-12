@@ -1,0 +1,49 @@
+<resources>
+    <string name="app_name">할 일 관리</string>
+
+    <string name="title_list">할 일 목록</string>
+    <string name="title_add">할 일 추가</string>
+    <string name="title_edit">할 일 편집</string>
+
+    <string name="filter_all">전체 (%d)</string>
+    <string name="filter_todo">할 일 (%d)</string>
+    <string name="filter_in_progress">진행 중 (%d)</string>
+    <string name="filter_done">완료 (%d)</string>
+
+    <string name="empty_list">할 일이 없습니다</string>
+    <string name="btn_add">+ 추가</string>
+    <string name="btn_save">저장</string>
+    <string name="btn_cancel">취소</string>
+    <string name="back">뒤로</string>
+    <string name="btn_delete">삭제</string>
+    <string name="btn_delete_selected">선택 삭제 (%d)</string>
+    <string name="btn_clear_selection">선택 해제</string>
+
+    <string name="label_title">제목</string>
+    <string name="label_note">메모</string>
+    <string name="label_due">마감일</string>
+    <string name="label_status">상태</string>
+    <string name="hint_title">제목을 입력하세요</string>
+    <string name="hint_note">메모를 입력하세요 (선택)</string>
+    <string name="hint_due">눌러서 날짜 선택 (선택)</string>
+    <string name="btn_clear_date">지우기</string>
+    <string name="due_label">마감 %s</string>
+
+    <string name="menu_status">상태 변경</string>
+    <string name="menu_edit">수정</string>
+    <string name="menu_delete">삭제</string>
+    <string name="move_start">시작 ▶</string>
+    <string name="move_done">완료 ▶</string>
+    <string name="in_progress_prefix">[진행 중] %s</string>
+
+    <string name="confirm_delete">이 할 일을 삭제할까요?</string>
+    <string name="msg_title_required">제목을 입력하세요</string>
+    <string name="msg_due_invalid">마감일은 YYYY-MM-DD 형식으로 입력하세요</string>
+    <string name="msg_due_past">마감일은 오늘부터 선택할 수 있습니다</string>
+    <string name="msg_not_found">할 일을 찾을 수 없습니다</string>
+    <string name="msg_saved">저장했습니다</string>
+    <string name="msg_updated">수정했습니다</string>
+    <string name="msg_deleted">삭제했습니다</string>
+    <string name="confirm_delete_selected">선택한 %d개를 삭제할까요?</string>
+    <string name="msg_deleted_count">%d개 삭제했습니다</string>
+</resources>
