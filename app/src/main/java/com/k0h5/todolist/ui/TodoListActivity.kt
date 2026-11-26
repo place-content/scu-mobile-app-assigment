@@ -21,20 +21,25 @@ import com.k0h5.todolist.data.local.TodoStatus
 import com.k0h5.todolist.databinding.ActivityTodoListBinding
 import com.k0h5.todolist.vm.TodoFilter
 import com.k0h5.todolist.vm.TodoListViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class TodoListActivity : AppCompatActivity() {
+    companion object {
+        private const val TODAY_CHECK_MS = 60_000L
+    }
+
     private lateinit var binding: ActivityTodoListBinding
     private lateinit var adapter: TodoAdapter
     private val vm: TodoListViewModel by viewModels()
 
-    // 필터 라디오 버튼 id <-> 필터 값
+    // 필터 칩 <-> 필터 값
     private val filterButtons by lazy {
         mapOf(
-            TodoFilter.ALL to binding.rbAll,
-            TodoFilter.TODO to binding.rbTodo,
-            TodoFilter.IN_PROGRESS to binding.rbInProgress,
-            TodoFilter.DONE to binding.rbDone
+            TodoFilter.ALL to binding.chipAll,
+            TodoFilter.TODO to binding.chipTodo,
+            TodoFilter.IN_PROGRESS to binding.chipInProgress,
+            TodoFilter.DONE to binding.chipDone
         )
     }
 
@@ -89,7 +94,7 @@ class TodoListActivity : AppCompatActivity() {
         adapter = TodoAdapter(
             onSelect = { todo -> vm.toggleSelect(todo.id) },
             onMove = { todo -> todo.status.next()?.let { vm.setStatus(todo.id, it) } },
-            onClick = { todo -> openEdit(todo.id) },
+            onClick = { todo -> if (!vm.toggleIfSelecting(todo.id)) openEdit(todo.id) },
             onLongPress = { todo -> showItemMenu(todo) }
         )
         binding.rvTodos.layoutManager = LinearLayoutManager(this)
@@ -105,7 +110,8 @@ class TodoListActivity : AppCompatActivity() {
         // 선택 중일 때 뒤로가기 = 선택 해제
         onBackPressedDispatcher.addCallback(this, backToClearSelection)
 
-        binding.rgFilter.setOnCheckedChangeListener { _, checkedId ->
+        binding.cgFilter.setOnCheckedStateChangeListener { _, checkedIds ->
+            val checkedId = checkedIds.firstOrNull() ?: return@setOnCheckedStateChangeListener
             val selected = filterButtons.entries.firstOrNull { it.value.id == checkedId }?.key
             if (selected != null) vm.setFilter(selected)
         }
@@ -114,30 +120,50 @@ class TodoListActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     vm.rows.collect { rows ->
-                        adapter.submitList(rows)
+                        // 목록 반영이 끝난 뒤, 방금 추가한 항목이 있으면 그 위치로 (회전·필터 변경 땐 스크롤 안 함)
+                        adapter.submitList(rows) { scrollToJustAdded() }
                         binding.tvEmpty.visibility = if (rows.isEmpty()) View.VISIBLE else View.GONE
+                        // 필터 결과가 비었을 땐 "완료 항목이 없습니다"처럼 어떤 상태인지 알려줌
+                        binding.tvEmpty.text = vm.filter.value.status
+                            ?.let { getString(R.string.empty_filtered, it.label) }
+                            ?: getString(R.string.empty_list)
                     }
                 }
                 launch {
                     vm.counts.collect { counts -> updateFilterLabels(counts) }
                 }
                 launch {
-                    vm.selected.collect { ids -> updateBottomBar(ids.size) }
+                    vm.selected.collect { ids -> updateSelectionBar(ids.size) }
+                }
+                launch {
+                    // 목록이 id 확정보다 먼저 갱신됐을 수도 있으니 id가 정해질 때도 확인
+                    vm.justAdded.collect { scrollToJustAdded() }
+                }
+                launch {
+                    // 화면이 보이는 동안 1분마다 날짜 확인 → 자정이 지나면 "지남" 표시 갱신
+                    while (true) {
+                        vm.setToday(todayDue())
+                        delay(TODAY_CHECK_MS)
+                    }
                 }
             }
         }
+    }
+
+    private fun scrollToJustAdded() {
+        vm.takeJustAddedPosition(adapter.currentList)?.let { binding.rvTodos.scrollToPosition(it) }
     }
 
     private val backToClearSelection = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() = vm.clearSelection()
     }
 
-    private fun updateBottomBar(selectedCount: Int) {
+    private fun updateSelectionBar(selectedCount: Int) {
         val selecting = selectedCount > 0
-        binding.btnAddTodo.visibility = if (selecting) View.GONE else View.VISIBLE
-        binding.btnClearSelection.visibility = if (selecting) View.VISIBLE else View.GONE
-        binding.btnDeleteSelected.visibility = if (selecting) View.VISIBLE else View.GONE
-        binding.btnDeleteSelected.text = getString(R.string.btn_delete_selected, selectedCount)
+        // 선택 중이면 상단 헤더(제목 + 추가) 자리를 선택 바(n개 선택됨 · 선택 해제 · 삭제)로 바꿈
+        binding.headerDefault.visibility = if (selecting) View.GONE else View.VISIBLE
+        binding.selectionBar.visibility = if (selecting) View.VISIBLE else View.GONE
+        binding.tvSelectionCount.text = getString(R.string.selection_count, selectedCount)
         backToClearSelection.isEnabled = selecting
     }
 
@@ -155,10 +181,10 @@ class TodoListActivity : AppCompatActivity() {
     }
 
     private fun updateFilterLabels(counts: Map<TodoFilter, Int>) {
-        binding.rbAll.text = getString(R.string.filter_all, counts[TodoFilter.ALL] ?: 0)
-        binding.rbTodo.text = getString(R.string.filter_todo, counts[TodoFilter.TODO] ?: 0)
-        binding.rbInProgress.text = getString(R.string.filter_in_progress, counts[TodoFilter.IN_PROGRESS] ?: 0)
-        binding.rbDone.text = getString(R.string.filter_done, counts[TodoFilter.DONE] ?: 0)
+        binding.chipAll.text = getString(R.string.filter_all, counts[TodoFilter.ALL] ?: 0)
+        binding.chipTodo.text = getString(R.string.filter_todo, counts[TodoFilter.TODO] ?: 0)
+        binding.chipInProgress.text = getString(R.string.filter_in_progress, counts[TodoFilter.IN_PROGRESS] ?: 0)
+        binding.chipDone.text = getString(R.string.filter_done, counts[TodoFilter.DONE] ?: 0)
     }
 
     private fun openEdit(id: Long) {

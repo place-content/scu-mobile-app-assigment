@@ -1,7 +1,10 @@
 package com.k0h5.todolist.vm
 
+import com.k0h5.todolist.data.local.TodoStatus
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class TodoInputTest {
@@ -63,5 +66,43 @@ class TodoInputPastDueTest {
             TodoInput.Error.DUE_PAST,
             TodoInput.validate("과제", "2026-09-30", TodoInput.earliestDue(today, "2026-10-01"))
         )
+    }
+}
+
+class TodoInputHasChangesTest {
+    private val original = TodoInput.Draft("과제", "3장까지", "2026-12-01", TodoStatus.IN_PROGRESS)
+
+    @Test
+    fun sameValues_noChanges() {
+        assertFalse(TodoInput.hasChanges(original, original.copy()))
+        assertFalse(TodoInput.hasChanges(TodoInput.Draft(), TodoInput.Draft()))
+    }
+
+    @Test
+    fun onlyWhitespaceDiffers_noChanges() {
+        assertFalse(TodoInput.hasChanges(original, original.copy(title = "  과제 ", note = "3장까지\n")))
+        assertFalse(TodoInput.hasChanges(TodoInput.Draft(), TodoInput.Draft(title = "   ")))
+    }
+
+    @Test
+    fun anyFieldChanged_hasChanges() {
+        assertTrue(TodoInput.hasChanges(original, original.copy(title = "과제2")))
+        assertTrue(TodoInput.hasChanges(original, original.copy(note = "")))
+        assertTrue(TodoInput.hasChanges(original, original.copy(due = "")))
+        assertTrue(TodoInput.hasChanges(original, original.copy(status = TodoStatus.DONE)))
+    }
+}
+
+class TodoInputCanSaveTest {
+    @Test
+    fun blankTitle_cannotSave() {
+        assertFalse(TodoInput.canSave(""))
+        assertFalse(TodoInput.canSave("   "))
+    }
+
+    @Test
+    fun filledTitle_canSave() {
+        assertTrue(TodoInput.canSave("장보기"))
+        assertTrue(TodoInput.canSave(" a "))
     }
 }

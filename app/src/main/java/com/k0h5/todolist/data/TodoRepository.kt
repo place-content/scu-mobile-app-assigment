@@ -12,10 +12,11 @@ class TodoRepository(db: TodoDatabase) {
 
     suspend fun getById(id: Long): Todo? = dao.getById(id)
 
-    suspend fun add(title: String, note: String, dueDate: String) {
+    // 새 할 일 id를 돌려줌 (제목이 비어 저장하지 않았으면 null)
+    suspend fun add(title: String, note: String, dueDate: String): Long? {
         val t = title.trim()
-        if (t.isBlank()) return
-        dao.insert(Todo(title = t, note = note.trim(), dueDate = dueDate.trim()))
+        if (t.isBlank()) return null
+        return dao.insert(Todo(title = t, note = note.trim(), dueDate = dueDate.trim()))
     }
 
     suspend fun update(id: Long, title: String, note: String, dueDate: String, status: TodoStatus) {

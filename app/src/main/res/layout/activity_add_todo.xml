@@ -36,7 +36,22 @@
                 android:hint="@string/hint_title"
                 android:importantForAutofill="no"
                 android:inputType="text"
-                android:maxLines="1" />
+                android:maxLines="1">
+
+                <!-- 추가 화면에 들어오면 바로 제목을 입력할 수 있게 -->
+                <requestFocus />
+            </EditText>
+
+            <!-- 제목 없이 비활성 저장 버튼을 눌렀을 때만 보임 -->
+            <TextView
+                android:id="@+id/tvTitleError"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="@string/msg_title_required"
+                android:textColor="@color/danger"
+                android:textSize="12sp"
+                android:visibility="gone" />
 
             <EditText
                 android:id="@+id/etNote"
@@ -59,12 +74,19 @@
                 android:inputType="none"
                 android:maxLines="1" />
 
-            <Button
-                android:id="@+id/btnSave"
+            <!-- 저장 버튼이 비활성이면 터치가 이 영역으로 넘어옴 → 빈 필수 칸을 빨갛게 표시 -->
+            <FrameLayout
+                android:id="@+id/saveButtonArea"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/btn_save" />
+                android:layout_marginTop="16dp">
+
+                <Button
+                    android:id="@+id/btnSave"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/btn_save" />
+            </FrameLayout>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

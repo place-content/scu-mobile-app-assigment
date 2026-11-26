@@ -42,10 +42,12 @@ fun todayDue(): String {
 
 fun formatDue(year: Int, month: Int, day: Int): String = String.format(Locale.US, "%04d-%02d-%02d", year, month, day)
 
+private const val DUE_PARTS = 3 // 년-월-일
+
 // "2026-12-01" → (2026, 12, 1), 형식이 다르면 null
 fun parseDue(s: String): Triple<Int, Int, Int>? {
     val parts = s.trim().split("-")
-    if (parts.size != 3) return null
-    val nums = parts.map { it.toIntOrNull() ?: return null }
-    return Triple(nums[0], nums[1], nums[2])
+    val nums = parts.mapNotNull { it.toIntOrNull() }
+    // 세 조각이면서 세 조각 모두 숫자일 때만
+    return if (parts.size == DUE_PARTS && nums.size == DUE_PARTS) Triple(nums[0], nums[1], nums[2]) else null
 }

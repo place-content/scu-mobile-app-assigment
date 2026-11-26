@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#52677A</color>
-    <color name="primary_dark">#3E4F5E</color>
-    <color name="danger">#A6533C</color>
+    <color name="primary">#4F7A5E</color>
+    <color name="primary_dark">#3E6249</color>
+    <color name="danger">#B5473A</color>
     <color name="white">#FFFFFF</color>
+    <!-- 필터 칩 (선택 안 된 상태) -->
+    <color name="chip_bg">#F2F4F6</color>
+    <color name="chip_text">#4E5968</color>
 </resources>

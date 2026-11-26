@@ -1,0 +1,59 @@
+# 코드 검증 CI: 푸시·PR마다 빌드, 단위 테스트, Android 린트, ktlint, detekt를 실행
+# 로컬에서 같은 검사: ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug ktlintCheck detekt
+name: CI
+
+on:
+    push:
+        branches: [main, develop]
+    pull_request:
+
+# 같은 브랜치에 새로 푸시하면 이전 실행은 취소
+concurrency:
+    group: ci-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+
+jobs:
+    verify:
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+
+        steps:
+            - uses: actions/checkout@v4
+
+            # gradle/gradle-daemon-jvm.properties의 toolchainVersion(25)과 맞춤
+            - uses: actions/setup-java@v4
+              with:
+                  distribution: temurin
+                  java-version: 25
+
+            # Gradle 의존성·빌드 캐시
+            - uses: gradle/actions/setup-gradle@v4
+
+            - name: Build
+              run: ./gradlew :app:assembleDebug
+
+            - name: Unit tests
+              run: ./gradlew :app:testDebugUnitTest
+
+            - name: Android lint
+              run: ./gradlew :app:lintDebug
+
+            - name: ktlint
+              run: ./gradlew ktlintCheck
+
+            - name: detekt
+              run: ./gradlew detekt
+
+            # 실패했을 때 원인을 볼 수 있게 리포트 업로드 (Actions 실행 화면 → Artifacts)
+            - name: Upload reports
+              if: failure()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: reports
+                  path: |
+                      app/build/reports/
+                      build/reports/
+                  retention-days: 7
