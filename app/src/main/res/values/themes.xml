@@ -10,4 +10,24 @@
         <item name="colorSecondaryVariant">@color/primary_dark</item>
         <item name="colorOnSecondary">@color/white</item>
     </style>
+
+    <!-- Chip은 글자 굵기·크기를 textAppearance로 받음 -->
+    <style name="TextAppearance.Todo.FilterChip" parent="TextAppearance.MaterialComponents.Chip">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- 목록 상단 필터: 알약 모양, 테두리·체크 아이콘 없음, 선택된 칩만 채워진 색 -->
+    <style name="Widget.Todo.FilterChip" parent="Widget.MaterialComponents.Chip.Choice">
+        <item name="chipBackgroundColor">@color/chip_filter_bg</item>
+        <item name="android:textColor">@color/chip_filter_text</item>
+        <item name="android:textAppearance">@style/TextAppearance.Todo.FilterChip</item>
+        <item name="chipStrokeWidth">0dp</item>
+        <item name="chipCornerRadius">18dp</item>
+        <item name="chipMinHeight">36dp</item>
+        <item name="chipStartPadding">6dp</item>
+        <item name="chipEndPadding">6dp</item>
+        <item name="checkedIconVisible">false</item>
+        <item name="chipIconVisible">false</item>
+    </style>
 </resources>

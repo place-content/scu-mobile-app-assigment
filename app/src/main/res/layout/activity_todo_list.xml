@@ -9,11 +9,68 @@
     android:padding="16dp"
     tools:context=".ui.TodoListActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <!-- 상단 헤더: 평소엔 제목 + 추가, 체크박스로 선택 중이면 같은 자리가 선택 바로 바뀜 -->
+    <FrameLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/title_list"
-        android:textSize="22sp" />
+        android:minHeight="56dp">
+
+        <LinearLayout
+            android:id="@+id/headerDefault"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/title_list"
+                android:textSize="22sp" />
+
+            <Button
+                android:id="@+id/btnAddTodo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btn_add" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/selectionBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tvSelectionCount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                tools:text="2개 선택됨" />
+
+            <Button
+                android:id="@+id/btnClearSelection"
+                style="?attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btn_clear_selection" />
+
+            <Button
+                android:id="@+id/btnDeleteSelected"
+                app:backgroundTint="@color/danger"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="@string/btn_delete" />
+        </LinearLayout>
+    </FrameLayout>
 
     <HorizontalScrollView
         android:layout_width="match_parent"
@@ -21,37 +78,45 @@
         android:layout_marginTop="8dp"
         android:scrollbars="none">
 
-        <RadioGroup
-            android:id="@+id/rgFilter"
+        <!-- 하나만 고를 수 있고, 고른 걸 다시 눌러도 해제되지 않음 (라디오 버튼과 같은 동작) -->
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/cgFilter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checkedButton="@+id/rbAll"
-            android:orientation="horizontal">
+            app:checkedChip="@+id/chipAll"
+            app:chipSpacingHorizontal="8dp"
+            app:selectionRequired="true"
+            app:singleLine="true"
+            app:singleSelection="true">
 
-            <RadioButton
-                android:id="@+id/rbAll"
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipAll"
+                style="@style/Widget.Todo.FilterChip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="전체 (0)" />
 
-            <RadioButton
-                android:id="@+id/rbTodo"
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipTodo"
+                style="@style/Widget.Todo.FilterChip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="할 일 (0)" />
 
-            <RadioButton
-                android:id="@+id/rbInProgress"
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipInProgress"
+                style="@style/Widget.Todo.FilterChip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="진행 중 (0)" />
 
-            <RadioButton
-                android:id="@+id/rbDone"
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipDone"
+                style="@style/Widget.Todo.FilterChip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="완료 (0)" />
-        </RadioGroup>
+        </com.google.android.material.chip.ChipGroup>
     </HorizontalScrollView>
 
     <FrameLayout
@@ -72,37 +137,4 @@
             android:text="@string/empty_list"
             android:visibility="gone" />
     </FrameLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/btnAddTodo"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/btn_add" />
-
-        <!-- 체크박스로 하나 이상 선택했을 때만 보임 -->
-        <Button
-            android:id="@+id/btnClearSelection"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
-            android:layout_weight="1"
-            android:text="@string/btn_clear_selection"
-            android:visibility="gone" />
-
-        <Button
-            android:id="@+id/btnDeleteSelected"
-            app:backgroundTint="@color/danger"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_weight="1"
-            android:visibility="gone"
-            tools:text="선택 삭제 (0)" />
-    </LinearLayout>
 </LinearLayout>

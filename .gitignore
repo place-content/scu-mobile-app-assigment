@@ -15,3 +15,6 @@
 local.properties
 .kotlin
 *.swp
+
+CLAUDE.md
+.claude/*

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 다크 모드에서 필터 칩이 배경과 구분되도록 어두운 회색 계열 -->
+    <color name="chip_bg">#2C3035</color>
+    <color name="chip_text">#B0B8C1</color>
+</resources>

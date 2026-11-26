@@ -4,6 +4,7 @@ import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -21,6 +22,8 @@ class TodoAdapter(
 ) : ListAdapter<TodoRow, TodoAdapter.VH>(DIFF) {
 
     companion object {
+        private const val DONE_ALPHA = 0.5f // 완료 항목 흐리게 (F1.6)
+
         val DIFF = object : DiffUtil.ItemCallback<TodoRow>() {
             override fun areItemsTheSame(old: TodoRow, new: TodoRow) = old.todo.id == new.todo.id
             override fun areContentsTheSame(old: TodoRow, new: TodoRow) = old == new
@@ -38,6 +41,7 @@ class TodoAdapter(
 
     inner class VH(private val b: ItemTodoBinding) : RecyclerView.ViewHolder(b.root) {
         private var current: Todo? = null
+        private val dueColor = b.tvDueDate.textColors // 재사용되는 줄의 원래 글자색 복원용
 
         init {
             b.cbSelect.setOnClickListener { current?.let(onSelect) }
@@ -71,7 +75,15 @@ class TodoAdapter(
 
             b.tvNote.text = item.note
             b.tvNote.visibility = if (item.note.isBlank()) View.GONE else View.VISIBLE
-            b.tvDueDate.text = ctx.getString(R.string.due_label, item.dueDate)
+            // 기한 지난 미완료 항목은 "· 지남" + 경고색으로 눈에 띄게
+            val overdue = row.overdue
+            b.tvDueDate.text =
+                ctx.getString(if (overdue) R.string.due_label_overdue else R.string.due_label, item.dueDate)
+            if (overdue) {
+                b.tvDueDate.setTextColor(ContextCompat.getColor(ctx, R.color.danger))
+            } else {
+                b.tvDueDate.setTextColor(dueColor)
+            }
             b.tvDueDate.visibility = if (item.dueDate.isBlank()) View.GONE else View.VISIBLE
 
             // F1.6 완료된 항목은 취소선 + 흐리게
@@ -81,7 +93,7 @@ class TodoAdapter(
             } else {
                 b.tvItemTitle.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
             }
-            b.tvItemTitle.alpha = if (done) 0.5f else 1f
+            b.tvItemTitle.alpha = if (done) DONE_ALPHA else 1f
             b.tvNote.alpha = b.tvItemTitle.alpha
             b.tvDueDate.alpha = b.tvItemTitle.alpha
         }

@@ -22,7 +22,7 @@
         <activity
             android:name=".ui.AddTodoActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="stateVisible|adjustResize" />
         <activity
             android:name=".ui.EditTodoActivity"
             android:exported="false"

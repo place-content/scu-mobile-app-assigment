@@ -119,7 +119,7 @@ const rows = useMemo(() => applyFilter(todos, filter).map(t => ({ todo: t, selec
 목록 화면은 `rows`, `counts`, `selected` 세 개를 구독합니다.
 - `rows` → `adapter.submitList(rows)` (목록 다시 그림) + 빈 목록 안내 표시 여부
 - `counts` → 필터 버튼 글자 `전체 (4)` 갱신
-- `selected` → 하단 버튼(`+ 추가` ↔ `선택 해제`/`선택 삭제 (n)`) 전환
+- `selected` → 상단 헤더를 선택 바(`n개 선택됨` · `선택 해제` · `삭제`)로 바꾸기/되돌리기
 
 ## 데이터 흐름 예시
 
@@ -174,8 +174,8 @@ sequenceDiagram
 
     U->>L: 체크박스 2개 선택
     L->>VM: toggleSelect(id) ×2
-    VM-->>L: selected = {3, 5} → 하단 "선택 삭제 (2)"
-    U->>L: 선택 삭제 → 확인
+    VM-->>L: selected = {3, 5} → 상단 "2개 선택됨"
+    U->>L: 삭제 → 확인
     L->>VM: deleteSelected()
     VM->>VM: 선택 초기화
     VM->>D: DELETE FROM todos WHERE id IN (3, 5)

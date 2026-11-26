@@ -20,7 +20,7 @@
 | 화면 | `~Activity` | `TodoListActivity` |
 | 레이아웃 | `activity_~.xml`, 목록 한 줄은 `item_~.xml` | `activity_add_todo.xml`, `item_todo.xml` |
 | View ID | **교안과 같은 이름** + 종류 접두사 | `rvTodos`, `btnAddTodo`, `etTitle`, `etNote`, `etDue`, `btnSave`, `tvItemTitle` |
-| ID 접두사 | `btn` 버튼, `et` 입력칸, `tv` 텍스트, `rv` 목록, `cb` 체크박스, `rb` 라디오, `rg` 라디오 그룹, `sp` 스피너 | `cbSelect`, `rgFilter`, `spStatus` |
+| ID 접두사 | `btn` 버튼, `et` 입력칸, `tv` 텍스트, `rv` 목록, `cb` 체크박스, `chip` 칩, `cg` 칩 그룹, `sp` 스피너 | `cbSelect`, `cgFilter`, `chipAll`, `spStatus` |
 | 화면 루트 ID | 교안처럼 `~View` | `todoListView`, `addTodoView`, `editTodoView` |
 | Intent 키 | `EXTRA_~` 상수 (화면 클래스의 `companion object`) | `EditTodoActivity.EXTRA_ID` |
 | 문자열 키 | `title_` 화면 제목, `btn_` 버튼, `hint_` 입력 힌트, `label_` 라벨, `msg_` Toast, `confirm_` 확인 창, `menu_` 메뉴 | `msg_saved`, `confirm_delete` |
@@ -32,10 +32,12 @@
 
 | 색 이름 | 값 | 쓰는 곳 |
 |---|---|---|
-| `primary` | `#52677A` | 테마 `colorPrimary`, `colorSecondary` → 버튼, 체크박스, 라디오, 스피너 |
-| `primary_dark` | `#3E4F5E` | 테마 `colorPrimaryVariant`, `colorSecondaryVariant` |
-| `danger` | `#A6533C` | 삭제 버튼(`app:backgroundTint`), 삭제 확인 창의 `삭제` 글자 |
+| `primary` | `#4F7A5E` | 테마 `colorPrimary`, `colorSecondary` → 버튼, 체크박스, 스피너, 선택된 필터 칩 |
+| `primary_dark` | `#3E6249` | 테마 `colorPrimaryVariant`, `colorSecondaryVariant` |
+| `danger` | `#B5473A` | 삭제 버튼(`app:backgroundTint`), 삭제 확인 창의 `삭제` 글자 |
 | `white` | `#FFFFFF` | 버튼 위 글자 (`colorOnPrimary`) |
+| `chip_bg` | `#F2F4F6` (다크 `#2C3035`) | 선택 안 된 필터 칩 배경 |
+| `chip_text` | `#4E5968` (다크 `#B0B8C1`) | 선택 안 된 필터 칩 글자 |
 
 - 새 버튼은 기본 스타일을 그대로 쓰고, 삭제처럼 위험한 동작만 `danger`를 씁니다
 - UI는 기본 위젯 위주로 단순하게 (그라데이션, 커스텀 배경, 그림자 등은 쓰지 않음)
@@ -62,8 +64,9 @@
 | `./gradlew :app:lintDebug` | Android 린트 (`app/build/reports/lint-results-debug.html`) | `yarn lint` |
 | `./gradlew ktlintCheck` | Kotlin 코드 스타일 검사 | `eslint` / `prettier --check` |
 | `./gradlew ktlintFormat` | Kotlin 코드 스타일 자동 정리 | `prettier --write` |
+| `./gradlew detekt` | 정적 분석: 복잡도, 매직 넘버, 잠재 버그, 이름 규칙 (`build/reports/detekt/detekt.html`) | `eslint`의 품질 규칙 (sonarjs 등) |
 
-변경 후에는 `assembleDebug`, `testDebugUnitTest`, `lintDebug`, `ktlintCheck` 네 개 모두 통과해야 합니다. 커밋 전에 `ktlintFormat`을 한 번 돌리면 대부분의 스타일 문제가 자동으로 정리됩니다. (자동으로 못 고치는 것은 직접 수정 — 예: 변수 이름 규칙) 린트는 **오류 0개**가 기준입니다. (라이브러리 새 버전 안내, 버튼 스타일 권장 같은 경고는 남아 있음)
+변경 후에는 `assembleDebug`, `testDebugUnitTest`, `lintDebug`, `ktlintCheck`, `detekt` 다섯 개 모두 통과해야 합니다 (detekt는 지적 0건이 기준). 커밋 전에 `ktlintFormat`을 한 번 돌리면 대부분의 스타일 문제가 자동으로 정리됩니다. (자동으로 못 고치는 것은 직접 수정 — 예: 변수 이름 규칙) 린트는 **오류 0개**가 기준입니다. (라이브러리 새 버전 안내, 버튼 스타일 권장 같은 경고는 남아 있음)
 
 Android Studio에서는 Gradle Sync 후 상단 ▶ Run으로 에뮬레이터/기기에 설치합니다.
 
@@ -72,11 +75,13 @@ Android Studio에서는 Gradle Sync 후 상단 ▶ Run으로 에뮬레이터/기
 |---|---|
 | `.editorconfig` | 들여쓰기 4칸, UTF-8, LF 줄바꿈, 파일 끝 줄바꿈, Kotlin 스타일 `android_studio`, 한 줄 최대 120자. Android Studio와 ktlint가 같은 규칙을 읽음 |
 | `.gitattributes` | 저장소 줄바꿈을 LF로 통일 (`.bat`만 CRLF). Windows 팀원이 있어도 `gradlew`가 깨지지 않음. 이미지·jar는 바이너리로 처리 |
-| `build.gradle.kts` (루트) | `ktlintCheck`, `ktlintFormat` 작업 정의. ktlint 버전은 `gradle/libs.versions.toml`의 `ktlint` |
+| `build.gradle.kts` (루트) | `ktlintCheck`, `ktlintFormat`, `detekt` 작업 정의. 버전은 `gradle/libs.versions.toml`의 `ktlint`, `detekt` |
+| `config/detekt/detekt.yml` | detekt 규칙. 기본 규칙 위에 바꾸는 것만 적음 (한 줄 120자, 클래스당 함수 15개까지) |
 | `.github/CODEOWNERS` | 파일을 바꾸면 리뷰어가 자동으로 지정됨 |
+| `.github/workflows/ci.yml` | GitHub Actions CI. `main`·`develop` 푸시와 모든 PR에서 빌드 · 단위 테스트 · 린트 · ktlint · detekt 실행. 실패하면 리포트를 Artifacts로 올림 |
 | `CHANGELOG.md` | 버전별 변경 기록. 기능을 추가하면 `[Unreleased]`에 한 줄 추가, 버전을 올릴 때 날짜를 붙여 정리 |
 
-ktlint를 Gradle 플러그인이 아니라 CLI로 연결한 이유: 이 프로젝트의 AGP 9는 Kotlin을 내장 방식으로 처리해서, 기존 ktlint Gradle 플러그인이 소스를 제대로 찾지 못할 수 있기 때문입니다.
+ktlint·detekt를 Gradle 플러그인이 아니라 CLI로 연결한 이유: 이 프로젝트의 AGP 9는 Kotlin을 내장 방식으로 처리해서, 기존 Gradle 플러그인이 소스를 제대로 찾지 못할 수 있기 때문입니다.
 
 ## 7. 새 기능 추가 절차
 1. **데이터가 필요하면** `Todo.kt`에 필드 추가 → `TodoDatabase`의 `version` 올리기
@@ -85,5 +90,5 @@ ktlint를 Gradle 플러그인이 아니라 CLI로 연결한 이유: 이 프로�
 3. 판단 로직은 `vm/`에 순수 함수로 만들고 **테스트 먼저 작성**
 4. `TodoListViewModel`에 상태(`StateFlow`)나 이벤트 함수 추가
 5. 화면 글자는 `strings.xml`, 레이아웃은 `res/layout`, 연결은 Activity에서
-6. `ktlintFormat` 후 빌드 · 테스트 · 린트 · `ktlintCheck` 통과 확인
+6. `ktlintFormat` 후 빌드 · 테스트 · 린트 · `ktlintCheck` · `detekt` 통과 확인
 7. `README.md`, `CHANGELOG.md`, `docs/`(특히 [07-testing.md](07-testing.md) 체크리스트, [08-decisions.md](08-decisions.md)) 갱신
